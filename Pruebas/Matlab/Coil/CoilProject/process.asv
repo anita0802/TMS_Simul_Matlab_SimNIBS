@@ -1,0 +1,56 @@
+%%L4
+coil_Magnetic_Core_Rat_L4
+core00_Rect_L4
+core01_process_core
+core02_load_coil_and_core
+core03_charge_engine_linear
+core03_charge_engine_nonlinear
+
+%L4 1A
+coil_Magnetic_Core_Rat_L4_1A
+core00_Rect_L4_1A
+core01_process_core
+core02_load_coil_and_core
+core03_charge_engine_linear
+core03_charge_engine_nonlinear
+
+%% L1
+coil_Magnetic_Core_Rat_L1
+core00_Rect_L1
+core01_process_core
+core02_load_coil_and_core
+core03_charge_engine_linear
+core03_charge_engine_nonlinear
+
+%    Lpri: 1.0113e-06
+%    Lsec: 1.5366e-08
+%       L: 1.0267e-06
+
+%% L1 1A
+coil_Magnetic_Core_Rat_L1_1A
+core00_Rect_L1_1A
+core01_process_core
+core02_load_coil_and_core
+core03_charge_engine_linear
+core03_charge_engine_nonlinear
+
+%    Lpri: 1.0113e-06
+%    Lsec: 1.6925e-08
+%       L: 1.0283e-06
+
+%-- Common
+core04_surface_field_b
+core04_surface_field_c
+core05_line_field_electric1
+core05_line_field_electric2
+core05_line_field_magnetic
+
+cd ../../
+
+bem0_load_model
+bem1_setup_coil
+bem2_charge_engine
+bem3_surface_field_c
+bem3_surface_field_e
+bem4_define_planes
+bem5_volume_XZ
