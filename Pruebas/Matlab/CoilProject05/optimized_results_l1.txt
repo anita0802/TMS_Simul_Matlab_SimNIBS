@@ -1,5 +1,0 @@
-Óptimos encontrados:
-  pitch1 = 0.001 mm
-  pitch2 = 0.001 mm
-  Lcore  = 0.003 mm
-  Inductancia predicha = 7.5826e-07 H
