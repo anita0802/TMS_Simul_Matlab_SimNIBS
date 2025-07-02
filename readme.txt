@@ -1,6 +1,6 @@
 INSTRUCCIONES PARA LA EJECUCIÓN DE ARCHIVOS (Opciones separadas por rayas)
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 Para ajustar los parámetros del coil y del core en los siguientes archivos respectivamente:
 - C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/getCoilType.m
 - C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/getCoreType.m
@@ -10,18 +10,18 @@ La definición de las señales de excitación puede verse en:
 
 La definición de los materiales puede verse en:
 - C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/getMaterial.m
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 Para crear una bobina en Matlab, ejecutar el siguiente archivo una vez estén los parámetros del coil y core ajustados:
 - C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/coil_inductance_PGH.m
 Antes de ejecutar, hay que indicar:
   --> El tipo de bobina ('bobinaL1', 'bobinaL2', 'bobinaL3', 'bobinaL4', 'bobinaL5' o 'bobinaL6') en las líneas 10 y 11.
   --> El tipo de señal de excitación ('sinusoidal' o 'cuadrada') en la línea 20.
   --> El tipo de material ('m3_atan', 'm3_froe', 'gen_atan', 'met_froe') en la línea 318.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 1)
 Para generar un dataset, ejecutar el siguiente archivo:
 - C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/generate_dataset_Xlines.m
@@ -45,4 +45,4 @@ Para aplicar el algoritmo de Random Forest al dataset proprocesado y obtener una
 Antes de ejecutar, hay que indicar:
   --> La ruta del csv en la línea 9.
   --> El nombre del documento de texto donde se van a guardar los resultados obtenidos, con su ruta, en la línea 88.
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
