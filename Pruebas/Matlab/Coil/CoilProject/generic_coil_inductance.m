@@ -1,8 +1,15 @@
-if ~isunix
-    s = pwd; addpath(strcat(s(1:end-13), '\CoilEngine'));   
-else
-    s = pwd; addpath(strcat(s(1:end-13), '/CoilEngine'));  
+% Ruta absoluta a CoilEngine
+coilEngineDir = 'C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\Coil\CoilEngine';
+
+if ~isfolder(coilEngineDir)
+    error('No existe la carpeta CoilEngine en:\n%s', coilEngineDir);
 end
+
+addpath( genpath(coilEngineDir) );
+
+% Verificación
+disp(['Directorio: ' coilEngineDir]);
+disp(['meshwire en ruta: ' which('meshwire')]);
 
 %% DEFINICIÓN DE LA SEÑAL DE EXCITACIÓN
 % Selecciono señal de excitación y cargo parámetros
@@ -188,7 +195,7 @@ switch coil_type
     case 'bobinaL1'
         Pcenter(:, 2) = y'+0.006;
     case 'bobinaL2'
-        Pcenter(:, 2) = y'+0.0023;
+        Pcenter(:, 2) = y';
     case 'bobinaL3'
         Pcenter(:, 2) = y'+0.001;
     case 'bobinaL4'
@@ -208,19 +215,19 @@ P(:, 3)             = P(:, 3) - mean(P(:, 3));
 
 %   Create volume CAD model (overwrite the previous surface CAD model)
 %   Important: nodes of surface facets are automatically placed up front
-grade = 1.0e-3;  %   mesh resolution in meters
+grade = 3.0e-4;  %   mesh resolution in meters
 [P, t, normals, T] = meshvolume(P, t, grade);
 
 %   Create expanded volume SWG basis function CAD model (overwrite
 %   the previous volume CAD model)
 GEOM = meshvolumeswg(P, T); %   Creates structure GEOM with all necessary parameters
 
-%   Display CAD model (surface only)
-figure;
-bemf1_graphics_coil_CAD(GEOM.P, GEOM.t, 1);
-camlight; lighting phong;
-view(-140, 40);
-axis off
+% %   Display CAD model (surface only)
+% figure;
+% bemf1_graphics_coil_CAD(GEOM.P, GEOM.t, 1);
+% camlight; lighting phong;
+% view(-140, 40);
+% axis off
 
 save('core.mat', 'GEOM');
 
@@ -302,8 +309,8 @@ for m = 1:NonlinearIters
     if m>1
         contrasterror(m-1)  = norm(contrastold - contrast)/norm(contrast);
         chargeerror(m-1)    = norm(cfold - cf)/norm(cf); 
-        semilogy(contrasterror, '-*r'); hold on; semilogy(chargeerror, '-ob'); grid on; 
-        title('Nonlinear iterations: rel. delta mur (red), rel. delta magn. charge (blue)'); xlabel('iteration number'); drawnow;
+        %semilogy(contrasterror, '-*r'); hold on; semilogy(chargeerror, '-ob'); grid on; 
+        %title('Nonlinear iterations: rel. delta mur (red), rel. delta magn. charge (blue)'); xlabel('iteration number'); % drawnow;
     end    
     contrastold      = contrast; 
     mucoreold        = mucore;
@@ -323,21 +330,21 @@ for m = 1:NonlinearIters
 end
 close(h);
 
-%%   Coil graphics
-figure;
-bemf1_graphics_coil_CAD(strcoil.P, strcoil.t, 0);
-view(10, 20);
-
-%%  Core graphics
-str.EdgeColor = 'k'; str.FaceColor = 'c'; str.FaceAlpha = 1.0; 
-bemf2_graphics_base(P, GEOM.t, str);
-camlight; lighting phong;
-
-%%  General settings
-axis 'equal';  axis 'tight';   
-daspect([1 1 1]);
-set(gcf,'Color','White');
-axis off; view(10, 20);
+% %%   Coil graphics
+% figure;
+% bemf1_graphics_coil_CAD(strcoil.P, strcoil.t, 0);
+% view(10, 20);
+% 
+% %%  Core graphics
+% str.EdgeColor = 'k'; str.FaceColor = 'c'; str.FaceAlpha = 1.0; 
+% bemf2_graphics_base(P, GEOM.t, str);
+% camlight; lighting phong;
+% 
+% %%  General settings
+% axis 'equal';  axis 'tight';   
+% daspect([1 1 1]);
+% set(gcf,'Color','White');
+% axis off; view(10, 20);
 
 %%  Check charge conservation law (optional)
 e.conservation_law_error = sum(cf.*Area)/sum(abs(cf).*Area);

@@ -1,14 +1,21 @@
-clear all;
+% Ruta absoluta a CoilEngine
+coilEngineDir = 'C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\Coil\CoilEngine';
 
-if ~isunix
-    s = pwd; addpath(strcat(s(1:end-13), '\CoilEngine'));   
-else
-    s = pwd; addpath(strcat(s(1:end-13), '/CoilEngine'));  
+if ~isfolder(coilEngineDir)
+    error('No existe la carpeta CoilEngine en:\n%s', coilEngineDir);
 end
 
+addpath( genpath(coilEngineDir) );
+
+% Verificación
+disp(['Directorio: ' coilEngineDir]);
+disp(['meshwire en ruta: ' which('meshwire')]);
+
+clear all;
+
 % Selecciono tipo de bobina
-coil_type = 'bobinaL1';
-core_type = 'bobinaL1';
+coil_type = 'bobinaL4';
+core_type = 'bobinaL4';
 
 % Cargo parámetros del coil
 coil = getCoilType(coil_type);
@@ -213,7 +220,7 @@ switch coil_type
     case 'bobinaL1'
         Pcenter(:, 2) = y'+0.006;
     case 'bobinaL2'
-        Pcenter(:, 2) = y'+0.0023;
+        Pcenter(:, 2) = y';
     case 'bobinaL3'
         Pcenter(:, 2) = y'+0.001;
     case 'bobinaL4'
