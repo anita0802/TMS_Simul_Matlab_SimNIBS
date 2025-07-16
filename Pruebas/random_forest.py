@@ -6,7 +6,7 @@ from sklearn.metrics import mean_absolute_error
 from scipy.optimize import differential_evolution
 
 # 1. Cargar el archivo CSV
-file_path = 'C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/CoilProject05/coils_dataset_20lines_preprocesado_l1.csv'
+file_path = 'C:/Users/Patriciagh/Documents/TFM/Pruebas/coils_dataset_100lines_preprocesado_l3.csv'
 df = pd.read_csv(file_path)
 
 # 2. Preparar los datos para el entrenamiento
@@ -38,7 +38,7 @@ def loss(vars):
     elif coil_type == 4:
         L_target = 1.5e-6
     elif coil_type == 5:
-        L_target = 1e-6
+        L_target = 1.0e-6
     elif coil_type == 6:
         L_target = 0.0049e-6
 
@@ -85,7 +85,7 @@ print(f"  Lcore  = {opt_Lc:.10f} mm")
 print(f"  Inductancia predicha = {predicted_L:.10f} H")
 
 # Crear un archivo de texto con los resultados
-with open('C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/CoilProject05/optimized_results_l1.txt', 'w') as file:
+with open('C:/Users/Patriciagh/Documents/TFM/Pruebas/Resultados/optimized_results_l3.txt', 'w') as file:
     file.write(f"Óptimos encontrados:\n")
     file.write(f"  pitch1 = {opt_p1:.3f} mm\n")
     file.write(f"  pitch2 = {opt_p2:.3f} mm\n")
