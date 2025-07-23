@@ -2,23 +2,23 @@ function core = getCoreType (core_type) % Devuelve los parámetros del core para
 % core_type: bobinaL1, bobinaL2, bobinaL3, bobinaL4, bobinaL5, bobinaL6
 switch core_type
     case 'bobinaL1'
-        core.L    = 0.005;
-        core.wd    = 0.00075;
+        core.L      = 0.002;
+        core.wd     = 0.0001;
     case 'bobinaL2'
-        core.L    = 5.8e-3;
-        core.wd    = 0.0004;
+        core.L      = 0.001;
+        core.wd     = 0.00015;
     case 'bobinaL3'
-        core.L    = 4.5e-3;
-        core.wd    = 0.00042;
+        core.L      = 0.003;
+        core.wd     = 0.00055;
     case 'bobinaL4'
-        core.L    = 0.0018;
-        core.wd    = 0.0001246525;
+        core.L      = 0.0015;
+        core.wd     = 0.000116;
     case 'bobinaL5'
-        core.L    = 2e-3;
-        core.wd    = 0.00012;
+        core.L      = 0.0001;
+        core.wd     = 0.00012;
     case 'bobinaL6'
-        core.L    = 1e-3;
-        core.wd    = 0.00007;
+        core.L      = 0.00013;
+        core.wd     = 0.00002;
     otherwise
         error('getCoreType:unknownType', 'Tipo de bobina "%s" no reconocido.', core_type);
 end

@@ -12,10 +12,13 @@ disp(['Directorio: ' coilEngineDir]);
 disp(['meshwire en ruta: ' which('meshwire')]);
 
 clear all;
+clc;
+delete(gcp);
+close all;
 
 % Selecciono tipo de bobina
-coil_type = 'bobinaL4';
-core_type = 'bobinaL4';
+coil_type = 'bobinaL1';
+core_type = 'bobinaL1';
 
 % Cargo parámetros del coil
 coil = getCoilType(coil_type);
@@ -145,11 +148,11 @@ if coil.turns2 > 0
     t           = [t1; t2];
     switch coil_type
     case 'bobinaL1'
-        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.00095;
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
     case 'bobinaL2'
         P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
     case 'bobinaL3'
-        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.002;
     case 'bobinaL4'
         P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
     case 'bobinaL5'
@@ -172,6 +175,13 @@ else
     t           = t1;
     strcoil     = strcoil1;
 end
+
+coilZ = [min(P(:,3)), max(P(:,3))];   % límites Z de la bobina
+
+% guarda estos valores para usarlos en la generación del core,
+% por ejemplo:
+coilMinZ = coilZ(1);
+coilMaxZ = coilZ(2);
 
 figure;
 bemf1_graphics_coil_CAD(P, t, 0);
@@ -218,11 +228,11 @@ Pcenter(:, 3) = 0;
 
 switch coil_type
     case 'bobinaL1'
-        Pcenter(:, 2) = y'+0.006;
+        Pcenter(:, 2) = y'+0.007;
     case 'bobinaL2'
         Pcenter(:, 2) = y';
     case 'bobinaL3'
-        Pcenter(:, 2) = y'+0.001;
+        Pcenter(:, 2) = y'-0.001;
     case 'bobinaL4'
         Pcenter(:, 2) = y';
     case 'bobinaL5'
@@ -237,6 +247,21 @@ end
 P                   = meshrotate2(P, [0 1 0], pi/2);
 normals             = meshrotate2(normals, [0 1 0], pi/2);
 P(:, 3)             = P(:, 3) - mean(P(:, 3));
+
+% calcular límites Z del core
+coreZ = [min(P(:,3)), max(P(:,3))];
+
+% 1) Alineación por la base (mínimos)
+offsetZ = coilMinZ - coreZ(1);
+
+%  (O, si prefieres centrar verticalmente)
+% centerCoilZ = mean(coilZ);
+% centerCoreZ = mean(coreZ);
+% offsetZ = centerCoilZ - centerCoreZ;
+
+% aplicar desplazamiento automático
+P(:,3) = P(:,3) + offsetZ;
+
 
 %   Create volume CAD model (overwrite the previous surface CAD model)
 %   Important: nodes of surface facets are automatically placed up front
