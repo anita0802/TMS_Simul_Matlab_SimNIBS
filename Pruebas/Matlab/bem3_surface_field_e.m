@@ -51,11 +51,15 @@ if size(fields(strcoil), 1)>7
 end
 
 %%  Line graphics
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
-
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xyz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 %%   Shell graphics separate
 figure; view(-118, 18);             
 bemf2_graphics_surf_field_interp(P, t, temp, Indicator, objectnumber);
 if par == +1; string = ' just outside'; end
 if par == -1; string = ' just inside'; end
 title(strcat('Solution: E-field (total, normal, or tang.) in V/m ', string, tissue{objectnumber}));
+
+disp('FIN BEM3 - FIELD E')

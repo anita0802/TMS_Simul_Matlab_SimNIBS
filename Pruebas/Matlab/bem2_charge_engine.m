@@ -44,3 +44,4 @@ relative_residual = resvec(end)
 %%  Save solution data (surface charge density, principal value of surface field)
 save('output_charge_solution', 'c', 'Einc', 'resvec', 'conservation_law_error');
 
+disp('FIN BEM2')

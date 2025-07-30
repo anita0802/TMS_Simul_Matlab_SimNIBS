@@ -59,8 +59,10 @@ levels      = 20;
 bemf2_graphics_vol_field(temp, th1, th2, levels, y, z);
 
 %%  Line graphics
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'yz');
-
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'yz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'yz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 xlabel('Distance y, mm');
 ylabel('Distance z, mm');
 title(['E-field (V/m), ', label, '-component in the sagittal plane.']);
@@ -81,3 +83,4 @@ axis([ymin ymax zmin zmax]);
 line(mean([ymin ymax]), mean([zmin, zmax]), 'Marker', 'o', 'MarkerFaceColor', 'm', 'MarkerSize', 12); 
 grid off; set(gcf,'Color','White');
 
+disp('FIN BEM5 - VOLUME YZ')

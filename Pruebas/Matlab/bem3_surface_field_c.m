@@ -29,10 +29,13 @@ if size(fields(strcoil), 1)>7
 end
 
 %%  Line graphics
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
-
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xyz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Surface plot
 figure; view(-118, 18);
 bemf2_graphics_surf_field_interp(P, t, temp, Indicator, objectnumber);
 title(strcat('Solution: Surface charge density in C/m^2 for ', tissue{objectnumber}));
 
+disp('FIN BEM3 - FIELD C')

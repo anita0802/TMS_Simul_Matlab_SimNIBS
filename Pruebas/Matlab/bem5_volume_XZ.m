@@ -59,7 +59,10 @@ levels      = 20;
 bemf2_graphics_vol_field(temp, th1, th2, levels, x, z);
 
 %%  Line graphics
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xz');
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 xlabel('Distance x, mm');
 ylabel('Distance z, mm');
@@ -81,4 +84,4 @@ axis([xmin xmax zmin zmax]);
 line(mean([xmin xmax]), mean([zmin, zmax]), 'Marker', 'o', 'MarkerFaceColor', 'm', 'MarkerSize', 12); 
 grid off; set(gcf,'Color','White');
 
-
+disp('FIN BEM5 - VOLUME XZ')

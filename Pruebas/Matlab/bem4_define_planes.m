@@ -4,9 +4,9 @@
 %   Copyright SNM/WAW 2017-2020
 
 %%  Define all three planes (mm)
-X       = 0.0;                  %   YZ Cross-section position, mm
-Y       = -15;                %   XZ Cross-section position, mm
-Z       = 16;                 %   XY Cross-section position, mm
+X       = 0.14;                  %   YZ Cross-section position, mm
+Y       = -18.79;                %   XZ Cross-section position, mm
+Z       = 13.35;                 %   XY Cross-section position, mm
 delta   = 15;                       %   half plane window, mm      
 xmin = X - delta;                   % Cross-section left edge 
 xmax = X + delta;                   % Cross-section right edge
@@ -76,7 +76,10 @@ str.EdgeColor = 'none'; str.FaceColor = [1 0.75 0.65]; str.FaceAlpha = 1.0;
 bemf2_graphics_base(P, t0, str);
 
 %%  Line graphics
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xyz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%  General settings
 axis 'equal';  axis 'tight';   
@@ -120,7 +123,10 @@ for m = countXY
 end
 patch([xmin xmin xmax xmax],[ymin ymax ymax ymin], 'c', 'FaceAlpha', 0.35);
 line(X, Y, 'Marker', 'o', 'MarkerFaceColor', 'm', 'MarkerSize', 12);
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xy');
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xy');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xy');
+%%%%%%%%%%%%%%%%%%%%%%%%
 xlabel('x, mm'); ylabel('y, mm');
 axis 'equal';  axis 'tight'; 
 set(gcf,'Color','White');   
@@ -160,7 +166,10 @@ for m = countXZ
 end
 patch([xmin xmin xmax xmax], [zmin zmax zmax zmin], 'c', 'FaceAlpha', 0.35);
 line(X, Z, 'Marker', 'o', 'MarkerFaceColor', 'm', 'MarkerSize', 12);
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xz');
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 xlabel('x, mm'); ylabel('z, mm');
 axis 'equal';  axis 'tight'; 
 set(gcf,'Color','White');
@@ -200,8 +209,12 @@ for m = countYZ
 end
 patch([ymin ymin ymax ymax], [zmin zmax zmax zmin], 'c', 'FaceAlpha', 0.35);
 line(Y, Z, 'Marker', 'o', 'MarkerFaceColor', 'm', 'MarkerSize', 12);
-bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'yz');
+%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'yz');
+%%%%%%%%%%%%%%%%%%%%%%%%
+bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'yz');
+%%%%%%%%%%%%%%%%%%%%%%%%
 xlabel('y, mm'); ylabel('z, mm');
 axis 'equal';  axis 'tight'; 
 set(gcf,'Color','White');
 
+disp('FIN BEM4 - DEFINE PLANES')

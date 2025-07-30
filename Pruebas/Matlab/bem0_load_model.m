@@ -17,9 +17,9 @@ end
 %   files would then be shadowed by the files on the old model path
 warning off; rmpath(genpath(s)); warning on;
 
-engine_path =   [s, slash, 'TMS_Magnetic_Core01/Engine']; 
-model_path =    [s, slash, 'TMS_Magnetic_Core01/Model']; %  This line controls which model is loaded
-coil_path =     [s, slash, 'TMS_Magnetic_Core01/Coil/CoilProject05'];
+engine_path =   [s, slash, 'Engine']; 
+model_path =    [s, slash, 'Model']; %  This line controls which model is loaded
+coil_path =     [s, slash, 'Coil'];
 
 addpath(engine_path);
 addpath(model_path);
@@ -32,8 +32,8 @@ mu0         = 1.25663706e-006;  %   Magnetic permeability of vacuum(~air)
 %%  Import geometry and electrode data. Create useful sparse matrices. Import existing solution (if any)
 tic
 h                   = waitbar(0.5, 'Please wait - loading model data and existing solution (if any)'); 
-    load('C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\TMS_Magnetic_Core01\Model\CombinedMesh');
-    load('C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\TMS_Magnetic_Core01\Model\CombinedMeshP.mat');
+    load('C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\Model\CombinedMesh');
+    load('C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\Model\CombinedMeshP.mat');
 
 %%  Import saved solution (if exists)
 if exist('output_charge_solution.mat', 'file')
