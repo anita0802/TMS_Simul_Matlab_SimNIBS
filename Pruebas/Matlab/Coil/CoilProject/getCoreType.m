@@ -5,8 +5,8 @@ switch core_type
         core.L      = 0.002;
         core.wd     = 0.0001;
     case 'bobinaL2'
-        core.L      = 0.001;
-        core.wd     = 0.00015;
+        core.L      = 0.0058;
+        core.wd     = 0.0001;
     case 'bobinaL3'
         core.L      = 0.003;
         core.wd     = 0.00055;

@@ -5,184 +5,286 @@ if ~isfolder(coilEngineDir)
     error('No existe la carpeta CoilEngine en:\n%s', coilEngineDir);
 end
 
-addpath(genpath(coilEngineDir));
+addpath( genpath(coilEngineDir) );
 
-% Inicio limpio
-%clear; clc; delete(gcp('nocreate')); close all;
+% Verificación
+disp(['Directorio: ' coilEngineDir]);
+disp(['meshwire en ruta: ' which('meshwire')]);
 
-% Seleccionar tipo de bobina y core
-% coil_type = 'bobinaL4';
-% core_type = 'bobinaL4';
+clear all;
+clc;
+delete(gcp);
+close all;
 
-coil  = getCoilType(coil_type);
-core  = getCoreType(core_type);
+% Selecciono tipo de bobina
+coil_type = 'bobinaL4';
+core_type = 'bobinaL4';
 
-% Parámetros de excitación
-% signal_type = 'cuadrada';
-signal = getSignalExcitation(signal_type, coil.t_fall);
-I0   = signal.I0;
-f    = signal.f;
-T    = signal.T;
-dIdt = abs(signal.dIdt);
+% Cargo parámetros del coil
+coil = getCoilType(coil_type);
+
+t_fall = coil.t_fall;    % Tiempo de bajada (s) - Si la bobina “funciona en la bajada”, entonces 40 µs es el tiempo que tarda la corriente en caer de 0.5 A a 0 A
+
+%% DEFINICIÓN DE LA SEÑAL DE EXCITACIÓN
+% Selecciono señal de excitación y cargo parámetros
+signal_type = 'cuadrada';
+signal = getSignalExcitation(signal_type, t_fall);
+
+I0 = signal.I0;          % Amperes, for magnetic field
+f = signal.f;            % Frecuencia del pulso (Hz) - Sólo determina cada cuánto vuelve a repetirse esa bajada, pero no su pendiente
+T = signal.T;            % Periodo (s)
+dIdt = signal.dIdt;      % Amperes/sec, for electric field for 10 Hz
+dIdt = abs(dIdt);        % Magnitud para escalar el campo inducido
 
 %% GENERACIÓN DE LA GEOMETRÍA DE LA BOBINA Y MALLADO DEL ALAMBRE
-%% === Geometría y mallado de la bobina (hélice 1 - exterior) ===
-N      = 1000;
-twist  = 0;
-wd     = coil.wd;
-radius1= coil.radius1;
-pitch1 = coil.pitch1;
-turns1 = coil.turns1;
+%%  Parámetros de la primera hélice
+turns1       = coil.turns1;                     %   number of turns 
+N           = 1000;                             %   subdivisions total (cuántos puntos discretos habrá en la hélice). A mayor N, más suave
+twist       = 0;                                %   twist per delta theta. Antes había pi/12 (rotación adicional)
 
-% Generate helix mesh
-theta0 = turns1*2*pi;
-theta  = linspace(0, theta0, N);
-delta  = theta(2) - theta(1);
+%%  Geometría de la primera hélice
+wd      = coil.wd;                              %   conductor diameter in m 
+radius1 = coil.radius1;                         %   helix radius, m checks
+pitch1  = coil.pitch1;                          %   pitch amplitude (separación vertical entre vueltas)
 
-x = radius1 * cos(theta);    % 1xN
-y = radius1 * sin(theta);
-z = zeros(N,1);              % Nx1
-stepZ = pitch1 * delta / pi;
+% generate helix mesh
+
+theta0 = turns1*2*pi;                           %   how many turns (one turn is 2*pi)
+theta = linspace(0, theta0, N);                 % Ángulo en radianes
+delta_theta = theta(2) - theta(1);              % Paso angular
+
+x = radius1 * cos(theta);                       % Segmento X
+y = radius1 * sin(theta);                       % Segmento Y
+z = zeros(1, N);
+delta = pitch1 * delta_theta / pi;
 
 for m = 2:N
-    z(m) = z(m-1) + 0.5 * (1 - sign(sin(theta(m)))) * stepZ;
+    z(m) = z(m-1) + 0.5 * (1 - sign(sin(theta(m)))) * delta;  % Trayectoria de la hélice
 end
 
 % Suavizado de la trayectoria
-z = smooth(z);                % Nx1
-
-%   Centerline
-Pcenter1 = [x', y', z - 0.0009];  % Nx3
-
-% Other parameters
-M    = 16;
-flag = 1;
-sk   = 0;
-
-% Crear la malla de la bobina
-[strcoil1, check1] = meshwire(Pcenter1, wd, wd, M, flag, sk, twist);
-[P1, t1]           = meshsurface(Pcenter1, wd, wd, M, flag, twist);
-
-%%  Cálculo de inductancia
-mu0 = 1.25663706e-006;
-prec= 1e-4;
-Inductance_wire_1 = bemf6_inductance_neumann_integral(strcoil1, mu0, prec);
-%figure; bemf1_graphics_coil_CAD(P1,t1,0); view(0,0); camlight; lighting phong; axis off;
-
-%% === Creación y centrado de hélice 2 - interna (si existe) ===
-if coil.turns2 > 0
-    turns2 = coil.turns2;
-    radius2= coil.radius2;
-    pitch2 = coil.pitch2;
-
-    % Generate helix mesh
-    theta0 = turns2*2*pi;
-    theta  = linspace(0, theta0, N);
-    delta  = theta(2) - theta(1);
-
-    x2 = radius2 * cos(theta);
-    y2 = radius2 * sin(theta);
-    z2 = zeros(N,1);
-    stepZ2 = pitch2 * delta / pi;
-
-    for m = 2:N
-        z2(m) = z2(m-1) + 0.5 * (1 - sign(sin(theta(m)))) * stepZ2;
-    end
-
-    z2 = smooth(z2);
-
-    % Centerline
-    Pcenter2 = [x2', y2', z2 - 0.0009];
-
-    % Crear la malla de la bobina
-    [strcoil2, check2] = meshwire(Pcenter2, wd, wd, M, flag, sk, twist);
-    [P2, t2]          = meshsurface(Pcenter2, wd, wd, M, flag, twist);
-
-    % Cálculo de la inductancia
-    Inductance_wire_2 = bemf6_inductance_neumann_integral(strcoil2, mu0, prec);
-    %figure; bemf1_graphics_coil_CAD(P2,t2,0); view(0,0); camlight; lighting phong; axis off;
-
-    % Unir y centrar ambas hélices
-    %%   Construct the entire coil as a combination of the two helix parts
-    t2 = t2 + size(P1,1);
-    P  = [P1; P2];
-    t  = [t1; t2];
-
-    % Unir y centrar ambas hélices
-    centerY = mean([min(P(:,2)), max(P(:,2))]);
-    P(:,2)  = P(:,2) - centerY;
-
-    % Combinar malla de cable y centrar
-    strcoil2.Ewire = strcoil2.Ewire + size(strcoil1.Pwire,1);
-    strcoil.Pwire  = [strcoil1.Pwire; strcoil2.Pwire];
-    strcoil.Ewire  = [strcoil1.Ewire; strcoil2.Ewire];
-    strcoil.Swire  = [strcoil1.Swire; strcoil2.Swire];
-    wireY = strcoil.Pwire(:,2);
-    wireCtr = mean([min(wireY), max(wireY)]);
-    strcoil.Pwire(:,2) = wireY - wireCtr;
-else
-    % Si no hay segunda hélice, usamos la primera como resultado final
-    P       = P1;
-    t       = t1;
-    strcoil = strcoil1;
+for m = 1:1
+    z = smooth(z);
 end
 
-coilZ    = [min(P(:,3)), max(P(:,3))];   % límites Z de la bobina
-coilMinZ = coilZ(1);        % guarda este valores para usarlos en la generación del core
+%   Centerline
+clear Pcenter;
+Pcenter(:, 1) = x';
+Pcenter(:, 2) = y';
+Pcenter(:, 3) = z'-0.0009;
 
-%% Inductancia total y visualización
+%   Other parameters
+M    = 16;              %   number of cross-section subdivisions 
+flag = 1;               %   ellipsoidal cross-section    
+sk   = 0;               %   surface current distribution (skin layer)
+
+% Crear la malla de la bobina
+[strcoil1, check] = meshwire(Pcenter, wd, wd, M, flag, sk, twist);  % Modelo de alambre
+[P1, t1] = meshsurface(Pcenter, wd, wd, M, flag, twist);  % Malla CAD
+
+%%  Cálculo de inductancia
+mu0                         = 1.25663706e-006;  %   Magnetic permeability of vacuum(~air)
+prec                        = 1e-4;             % tolerancia numérica para la integral de Neumann
+Inductance_wire_1           = bemf6_inductance_neumann_integral(strcoil1, mu0, prec) % En Henrios (H)
+
+figure;
+bemf1_graphics_coil_CAD(P1, t1, 0);
+view(0, 0);
+camlight; lighting phong; axis off;
+
+%%  Second helix with a larger radius
+if coil.turns2 > 0
+    turns2  = coil.turns2; 
+    radius2 = coil.radius2;
+    pitch2  = coil.pitch2;
+
+    %  generate helix mesh
+
+    theta0 = turns2*2*pi;                       %   how many turns (one turn is 2*pi)
+    theta = linspace(0, theta0, N);  % Ángulo en radianes
+    delta_theta = theta(2) - theta(1);  % Paso angular
+
+    x = radius2 * cos(theta);  % Segmento X
+    y = radius2 * sin(theta);  % Segmento Y
+    z = zeros(1, N);
+    delta = pitch2 * delta_theta / pi;
+
+    for m = 2:N
+        z(m) = z(m-1) + 0.5 * (1 - sign(sin(theta(m)))) * delta;  % Trayectoria de la hélice
+    end
+
+    % Suavizado de la trayectoria
+    for m = 1:1
+        z = smooth(z);
+    end
+    
+    %   Centerline
+    clear Pcenter;
+    Pcenter(:, 1) = x';
+    Pcenter(:, 2) = y';
+    Pcenter(:, 3) = z'-0.0009;
+
+    %   Other parameters
+    M    = 16;              %   number of cross-section subdivisions 
+    flag = 1;               %   ellipsoidal cross-section    
+    sk   = 0;               %   surface current distribution (skin layer)
+
+    % Crear la malla de la bobina
+    [strcoil2, check] = meshwire(Pcenter, wd, wd, M, flag, sk, twist);  % Modelo de alambre
+    [P2, t2] = meshsurface(Pcenter, wd, wd, M, flag, twist);  % Malla CAD
+    
+    mu0                        = 1.25663706e-006;  %   Magnetic permeability of vacuum(~air)
+    prec                       = 1e-4;
+    Inductance_wire_2          = bemf6_inductance_neumann_integral(strcoil2, mu0, prec)
+ 
+    figure;
+    bemf1_graphics_coil_CAD(P2, t2, 0);
+    view(0, 0);
+    camlight; lighting phong; axis off;
+
+    %%   Construct the entire coil as a combination of the two helix parts
+    t2          = t2+size(P1, 1);
+    P           = [P1; P2];
+    t           = [t1; t2];
+    switch coil_type
+    case 'bobinaL1'
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
+    case 'bobinaL2'
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
+    case 'bobinaL3'
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.002;
+    case 'bobinaL4'
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
+    case 'bobinaL5'
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.001;
+    case 'bobinaL6'
+        P(:, 2)     = P(:, 2) - min(P(:, 2))-0.0015;
+    otherwise
+        warning('Bobina no reconocia')
+    end
+    
+    strcoil2.Ewire          = strcoil2.Ewire+size(strcoil1.Pwire, 1);
+    strcoil.Pwire           = [strcoil1.Pwire; strcoil2.Pwire]; 
+    strcoil.Ewire           = [strcoil1.Ewire; strcoil2.Ewire];
+    strcoil.Swire           = [+strcoil1.Swire; strcoil2.Swire;]; %  do not swap current direction for the second part
+    strcoil.Pwire(:, 2)     = strcoil.Pwire(:, 2) - min(strcoil.Pwire(:, 2));
+
+else
+    % Si no hay segunda hélice, usamos la primera como resultado final
+    P           = P1;
+    t           = t1;
+    strcoil     = strcoil1;
+end
+
+coilZ = [min(P(:,3)), max(P(:,3))];   % límites Z de la bobina
+
+% guarda estos valores para usarlos en la generación del core,
+% por ejemplo:
+coilMinZ = coilZ(1);
+coilMaxZ = coilZ(2);
+
+figure;
+bemf1_graphics_coil_CAD(P, t, 0);
+view(10, 20);
+camlight; lighting phong; axis off;
+
+%%   Inductance calculator
 clear I;
-Inductance = bemf6_inductance_neumann_integral(strcoil, mu0, prec);
-%figure; bemf1_graphics_coil_CAD(P,t,0); view(10,20); camlight; lighting phong; axis off;
+mu0              = 1.25663706e-006;  %   Magnetic permeability of vacuum(~air)
+prec             = 1e-4;
+Inductance       = bemf6_inductance_neumann_integral(strcoil, mu0, prec)
+if check > 3
+    disp('Decrease the ratio AvgSegmentLength/AvgSegmentSpacing for the wire mesh. Inductance accuracy cannot be guaranteed.')
+end
 
-%% Guardado estructura bobina
-strcoil.I0   = I0;
-strcoil.dIdt = dIdt;
-strcoil.P    = P;
-strcoil.t    = t;
-save('coil','strcoil');
+%% Guardado de resultados
+strcoil.I0      = I0;       % Añade al struct strcoil los parámetros de corriente y la malla CAD
+strcoil.dIdt    = dIdt;
+strcoil.P       = P;
+strcoil.t       = t;
+save('coil', 'strcoil');    % Guarda todo en coil.mat, listo para cargarlo en otros scripts
 
 %% %% %% %% %% %% %% %% %% %% %% %%
 %% GENERACIÓN DE LA GEOMETRÍA DEL NÚCLEO
-%% === Generación y centrado automático del núcleo ===
-par = linspace(0,1,100);
-L   = core.L;
-x   = L * par;
+% Cargo parámetros del core
+core = getCoreType(core_type);
+
+%   The brick centerline is given first
+par = linspace(0, 1, 100);
+L   = core.L;                       %   cylinder height in m
+x = L*par;                          %   segment
+y = 0*par;                          %   segment
+
+%   Other parameters
+wd    = core.wd;      %   conductor diameter in m
+M    = 32;          %   number of cross-section subdivisions 
+flag = 1;           %   circular cross-section    
 
 %   Create surface CAD model
-Pcenter = [x', zeros(length(x),1), zeros(length(x),1)];
+clear Pcenter;
+Pcenter(:, 1) = x';
+Pcenter(:, 2) = y';
+Pcenter(:, 3) = 0;
 
-[Pc, tc, normals] = meshsurface(Pcenter, core.wd, core.wd, 32, 1, 0);
-Pc = meshrotate2(Pc, [0 1 0], pi/2);
-normals = meshrotate2(normals, [0 1 0], pi/2);
-Pc(:,3) = Pc(:,3) - mean(Pc(:,3));
+switch coil_type
+    case 'bobinaL1'
+        Pcenter(:, 2) = y'+0.007;
+    case 'bobinaL2'
+        Pcenter(:, 2) = y';
+    case 'bobinaL3'
+        Pcenter(:, 2) = y'-0.001;
+    case 'bobinaL4'
+        Pcenter(:, 2) = y';
+    case 'bobinaL5'
+        Pcenter(:, 2) = y'+0.0001;
+    case 'bobinaL6'
+        Pcenter(:, 2) = y';
+    otherwise
+        warning('Bobina no reconocia')
+end
+
+[P, t, normals]     = meshsurface(Pcenter, wd, wd, M, flag, 0);  % CAD mesh
+P                   = meshrotate2(P, [0 1 0], pi/2);
+normals             = meshrotate2(normals, [0 1 0], pi/2);
+P(:, 3)             = P(:, 3) - mean(P(:, 3));
 
 % calcular límites Z del core
-coreZ   = [min(Pc(:,3)), max(Pc(:,3))];
+coreZ = [min(P(:,3)), max(P(:,3))];
 
-% Alineación por la base (mínimos)
-offsetZ= coilMinZ - coreZ(1);
+% 1) Alineación por la base (mínimos)
+offsetZ = coilMinZ - coreZ(1);
+
+%  (O, si prefieres centrar verticalmente)
+% centerCoilZ = mean(coilZ);
+% centerCoreZ = mean(coreZ);
+% offsetZ = centerCoilZ - centerCoreZ;
 
 % aplicar desplazamiento automático
-Pc(:,3)= Pc(:,3) + offsetZ;
+P(:,3) = P(:,3) + offsetZ;
+
 
 %   Create volume CAD model (overwrite the previous surface CAD model)
 %   Important: nodes of surface facets are automatically placed up front
-grade  = 1e-4;  %   mesh resolution in meters
-[Pv, tv, normalsV, T] = meshvolume(Pc, tc, grade);
+grade = 1.0e-3;  %   mesh resolution in meters
+[P, t, normals, T] = meshvolume(P, t, grade);
 
 %   Create expanded volume SWG basis function CAD model (overwrite
 %   the previous volume CAD model)
-GEOM = meshvolumeswg(Pv, T); %   Creates structure GEOM with all necessary parameters
+GEOM = meshvolumeswg(P, T); %   Creates structure GEOM with all necessary parameters
 
-%figure; bemf1_graphics_coil_CAD(GEOM.P, GEOM.t, 1); camlight; lighting phong; view(-140,40); axis off;
+%   Display CAD model (surface only)
+figure;
+bemf1_graphics_coil_CAD(GEOM.P, GEOM.t, 1);
+camlight; lighting phong;
+view(-140, 40);
+axis off
 
-save('core.mat','GEOM');
+save('core.mat', 'GEOM');
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  Define EM constants
 eps0        = 8.85418782e-012;  %   Dielectric permittivity of vacuum(~air)
-mu0         = 31.82776031e-006;
+mu0         = 31.82776031e-006;  %   Magnetic permeability of vacuum(~air) 1.25663706e-006
 
 %% Load core 
 name{1}     = 'core.mat'; load(name{1}); 
@@ -203,20 +305,20 @@ ProcessingTime  = toc
 RnumberE        = 32;    %   number of neighbor triangles for analytical integration (fixed, optimized)
 numThreads      = 4;
 parpool(numThreads);
-ineighborE      = knnsearch(Center, Center, 'k', RnumberE);   % [1:N, 1:Rnumber]
-ineighborE      = ineighborE';           %   do transpose  
-[EC, PC, EFX, EFY, EFZ, PF] ...
-                    = meshneighborints(P, t, normals, Area, Center, RnumberE, ineighborE);
-ineighborE      = knnsearch(GEOM.Center, GEOM.Center, 'k', RnumberE);   % [1:N, 1:Rnumber]
-ineighborE      = ineighborE';           %   do transpose  
-[EC0, PC0, EFX0, EFY0, EFZ0, PF0] ...
-                    = meshneighborints(P, GEOM.t, GEOM.normals, GEOM.Area, GEOM.Center, RnumberE, ineighborE);
+    ineighborE      = knnsearch(Center, Center, 'k', RnumberE);   % [1:N, 1:Rnumber]
+    ineighborE      = ineighborE';           %   do transpose  
+    [EC, PC, EFX, EFY, EFZ, PF] ...
+                        = meshneighborints(P, t, normals, Area, Center, RnumberE, ineighborE);
+    ineighborE      = knnsearch(GEOM.Center, GEOM.Center, 'k', RnumberE);   % [1:N, 1:Rnumber]
+    ineighborE      = ineighborE';           %   do transpose  
+    [EC0, PC0, EFX0, EFY0, EFZ0, PF0] ...
+                        = meshneighborints(P, GEOM.t, GEOM.normals, GEOM.Area, GEOM.Center, RnumberE, ineighborE);
 
-%%   Add accurate integration for arbitrary observation points
-MidP            = GEOM.CenterT;
-ineighborE      = knnsearch(MidP, Center, 'k', RnumberE);   % [1:N, 1:Rnumber]
-ineighborE      = ineighborE';           %   do transpose 
-[ESX, ESY, ESZ] = meshneighborintspoints(MidP, P, t, normals, Area, Center, RnumberE, ineighborE);
+    %%   Add accurate integration for arbitrary observation points
+    MidP            = GEOM.CenterT;
+    ineighborE      = knnsearch(MidP, Center, 'k', RnumberE);   % [1:N, 1:Rnumber]
+    ineighborE      = ineighborE';           %   do transpose 
+    [ESX, ESY, ESZ] = meshneighborintspoints(MidP, P, t, normals, Area, Center, RnumberE, ineighborE);
 delete(gcp('nocreate'));
 
 save ProcessedCore P t normals Indicator Area Center eps0 mu0 GEOM EC0 EFX0 EFY0 EFZ0 EC EFX EFY EFZ ESX ESY ESZ %Neighbors
@@ -245,7 +347,7 @@ clear           contrasterror;
 clear           chargeerror;
 Hpri            = bemf3_inc_field_magnetic(strcoil, GEOM.CenterT, prec);    %   Primary coil field at T centers
 % Selecciono tipo de material y lo cargo
-% material_type = 'm3_froe';
+material_type = 'm3_froe';
 mucore          = getMaterial(Hpri, material_type);                                    %   Initial mucore at all T centers
 contrastS       = (mucore(GEOM.TetS) - 1)./(mucore(GEOM.TetS) + 1);                                         %   Local initial contrast for surface facets        
 contrastV       = (mucore(GEOM.TetP) - mucore(GEOM.TetM))./(mucore(GEOM.TetP) + mucore(GEOM.TetM));         %   Local initial contrast for inner facets
@@ -257,8 +359,8 @@ for m = 1:NonlinearIters
     if m>1
         contrasterror(m-1)  = norm(contrastold - contrast)/norm(contrast);
         chargeerror(m-1)    = norm(cfold - cf)/norm(cf); 
-        % semilogy(contrasterror, '-*r'); hold on; semilogy(chargeerror, '-ob'); grid on; 
-        % title('Nonlinear iterations: rel. delta mur (red), rel. delta magn. charge (blue)'); xlabel('iteration number'); drawnow;
+        semilogy(contrasterror, '-*r'); hold on; semilogy(chargeerror, '-ob'); grid on; 
+        title('Nonlinear iterations: rel. delta mur (red), rel. delta magn. charge (blue)'); xlabel('iteration number'); drawnow;
     end    
     contrastold      = contrast; 
     mucoreold        = mucore;
@@ -283,13 +385,13 @@ end
 close(h);
 
 %%  Output convergence data
-% %  Plot GMRES convergence history
-% figure
-% resvec = resvec/resvec(1);
-% semilogy(resvec, '-o'); grid on;
-% title('Relative residual of the iterative solution');
-% xlabel('Iteration number');
-% ylabel('Relative residual');
+%  Plot GMRES convergence history
+figure
+resvec = resvec/resvec(1);
+semilogy(resvec, '-o'); grid on;
+title('Relative residual of the iterative solution');
+xlabel('Iteration number');
+ylabel('Relative residual');
 
 %%   Coil graphics
 figure;
@@ -345,7 +447,6 @@ strcoil.Moments = Moments;
 strcoil.CoreP   = P;
 strcoil.Coret   = t;
 save('coil', 'strcoil');
-disp('¡Cálculo completado y guardado!');
 
 % %% COMPROBACIÓN DE INDUCTANCIA
 % Inductance_Expected = coil.L;
@@ -394,7 +495,6 @@ fprintf(fileID, '  dIdt                             = %.4f A/s\n',  dIdt);
 fprintf(fileID, '  Corriente I0                     = %.4f A\n',    I0);
 fprintf(fileID, '  Diámetro del conductor del coil  = %.4f m\n',    coil.wd);
 fprintf(fileID, '  Inductancia objetivo             = %.4f H\n',    coil.L);
-fprintf(fileID, '  Altura establecida               = %.4f H\n',    coil.h);
 fprintf(fileID, '  Num vueltas coil interno         = %.4f \n',     coil.turns1);
 fprintf(fileID, '  Radio coil interno               = %.4f m\n',    coil.radius1);
 fprintf(fileID, '  Pitch coil interno               = %.4f m\n',    coil.pitch1);
@@ -413,4 +513,4 @@ fprintf(fileID, '  Altura de la hélice interior     = %.2f mm\n',   altura_heli
 fclose(fileID);
 
 % Confirmar guardado
-fprintf('Archivo con parámetros guardado correctamente:\n%s\n', out_path);
+fprintf('Archivo guardado correctamente:\n%s\n', out_path);
