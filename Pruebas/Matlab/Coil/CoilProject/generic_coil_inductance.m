@@ -219,7 +219,23 @@ ProcessingTime  = toc
 %   Indexes into neighbor triangles
 RnumberE        = 32;    %   number of neighbor triangles for analytical integration (fixed, optimized)
 numThreads      = 4;
-parpool(numThreads);
+
+% parpool(numThreads);
+% Intentar arrancar pool paralelo; si falla, seguimos en secuencial
+try
+    % Solo creamos uno nuevo si no hay un pool ya abierto
+    p = gcp('nocreate');
+    if isempty(p)
+        % Usa el perfil local por defecto o especifica 'Processes'
+        parpool('local', numThreads);
+    elseif p.NumWorkers ~= numThreads
+        delete(p);
+        parpool('local', numThreads);
+    end
+catch ME
+    warning('No se pudo iniciar parpool con %d workers: %s\nContinuando en modo secuencial.', ...
+            numThreads, ME.message);
+end
 
 % --- superficie exterior ---
 nCenters = size(Center, 1);

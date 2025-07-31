@@ -5,7 +5,7 @@ addpath('C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject');
 clear all;
 clc;
 
-coil_type = 'bobinaL4';
+coil_type = 'bobinaL6';
 core_type     = coil_type;
 signal_type   = 'cuadrada';
 material_type = 'm3_froe';
@@ -14,7 +14,8 @@ if ~ischar(coil_type) || ~ismember(coil_type, {'bobinaL1', 'bobinaL2', 'bobinaL3
     error('coilName is not valid or recognized.');
 end
 
-
+% generate_dataset_Xlines
+% generate_dataset_Xlines_ejecucion2
 
 
 % 3) Llamada a la función

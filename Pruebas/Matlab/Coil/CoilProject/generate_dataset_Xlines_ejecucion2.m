@@ -3,7 +3,7 @@ addpath('C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject');
 clear all;
 clc;
 
-coil_type = 'bobinaL4';
+coil_type = 'bobinaL6';
 
 if ~ischar(coil_type) || ~ismember(coil_type, {'bobinaL1', 'bobinaL2', 'bobinaL3', 'bobinaL4', 'bobinaL5', 'bobinaL6'})
     error('coilName is not valid or recognized.');
@@ -44,7 +44,7 @@ else
 end
 
 % Número de iteraciones por parámetro (nº combinaciones)
-N = 4;
+N = 6;
 N1 = N;
 N2 = N;
 N3 = N;
