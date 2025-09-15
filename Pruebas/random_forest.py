@@ -2,16 +2,21 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error
+#from sklearn.metrics import mean_absolute_error
 from scipy.optimize import differential_evolution
 
 # 1. Cargar el archivo CSV
-file_path = 'C:/Users/Patriciagh/Documents/TFM/Pruebas/coils_dataset_100lines_preprocesado_l3.csv'
+file_path = 'coils_dataset_bobinaL4_05A_2025-07-30_22-21-47_preprocesado.csv'
 df = pd.read_csv(file_path)
 
 # 2. Preparar los datos para el entrenamiento
-X = df[['pitch1', 'pitch2', 'Lcore', 'coil_type']]  # Características de entrada
-y = df['L']  # Inductancia (valor objetivo)
+# Incluir nuevos parámetros: r1, r2, core_wd, turns1, turns2
+features = ['coil_type', 'turns1', 'turns2', 'r1', 'pitch1', 'pitch2', 'Lcore', 'r2', 'core_wd']
+X = df[features]
+y = df['L']  # Inductancia objetivo
+
+# Convertir coil_type a variables dummy
+X = pd.get_dummies(X, columns=['coil_type'], drop_first=True)
 
 # 3. Entrenamiento del modelo Random Forest
 X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -19,75 +24,121 @@ rf = RandomForestRegressor(n_estimators=200, max_depth=12, random_state=0)
 rf.fit(X_tr, y_tr)
 y_pred = rf.predict(X_te)
 
-# 4. Calcular el error absoluto medio en el conjunto de prueba
-mae = mean_absolute_error(y_te, y_pred)
-print(f"MAE en test: {mae:.4f} H")
-
 # 5. Función de pérdida para optimización inversa
-def loss(vars):
-    p1, p2, Lc = vars
-    coil_type = 1
+def loss(vars, fixed_features, rf_model, dummy_columns):
+    # vars: [p1, p2, Lc, r1, wd]
+    p1, p2, Lc, r2, wd = vars
+    # fixed_features: dict con valores de r2, turns1, turns2, coil_type
+    feat = {
+        'turns1': fixed_features['turns1'],
+        'turns2': fixed_features['turns2'],
+        'r1': fixed_features['r1'],
+        'pitch1': p1,
+        'pitch2': p2,
+        'Lcore': Lc,
+        'r2': r2,
+        'core_wd': wd,
+    }
 
-    # Determinamos el valor de L_target según coil_type
-    if coil_type == 1:
-        L_target = 1e-6
-    elif coil_type == 2:
-        L_target = 1.5e-6
-    elif coil_type == 3:
-        L_target = 0.6e-6
-    elif coil_type == 4:
-        L_target = 1.5e-6
-    elif coil_type == 5:
-        L_target = 1.0e-6
-    elif coil_type == 6:
-        L_target = 0.0049e-6
+    # Añadir coil_type dummy
+    for col in dummy_columns:
+        feat[col] = 1 if col == f"coil_type_{fixed_features['coil_type']}" else 0
 
-    # Crear un array de características para la predicción
-    X_pred = pd.DataFrame([[p1, p2, Lc, coil_type]])
-
-    # Predecir la inductancia con el modelo Random Forest
-    Lpred = rf.predict(X_pred)[0]
-
-    # Función de pérdida: diferencia cuadrada entre la inductancia predicha y L_target
+    X_pred = pd.DataFrame([feat])[rf_model.feature_names_in_]
+    Lpred = rf_model.predict(X_pred)[0]
+    # Definir L_target según coil_type
+    L_target_map = {
+        1: 1e-6,
+        2: 1.5e-6,
+        3: 0.6e-6,
+        4: 1.5e-6,
+        5: 1.0e-6,
+        6: 0.0049e-6,
+    }
+    L_target = L_target_map[fixed_features['coil_type']]
     return (Lpred - L_target)**2
 
-# 6. Uso del modelo para encontrar los parámetros para L_target
-p1_min, p1_max = df['pitch1'].min(), df['pitch1'].max()
-p2_min, p2_max = df['pitch2'].min(), df['pitch2'].max()
-Lc_min, Lc_max = df['Lcore'].min(), df['Lcore'].max()
+# 6. Preparar parámetros para optimización
+fixed = {
+    'coil_type': 4,
+    'r1': df['r1'].iloc[0],
+    'turns1': df['turns1'].iloc[0],
+    'turns2': df['turns2'].iloc[0],
+}
 
-# Establecer los límites para los parámetros
-bounds = [(p1_min, p1_max), (p2_min, p2_max), (Lc_min, Lc_max)]
+bounds = [
+    (df['pitch1'].min(), df['pitch1'].max()),
+    (df['pitch2'].min(), df['pitch2'].max()),
+    (df['Lcore'].min(), df['Lcore'].max()),
+    (df['r2'].min(), df['r2'].max()),
+    (df['core_wd'].min(), df['core_wd'].max()),
+]
 
-# Ejecutar la optimización para encontrar los mejores parámetros
-res = differential_evolution(loss, bounds, polish=True)
+dummy_cols = [c for c in X.columns if c.startswith('coil_type_')]
 
-# Obtener los valores optimizados
-opt_p1, opt_p2, opt_Lc = res.x
+res = differential_evolution(
+    loss,
+    bounds,
+    args=(fixed, rf, dummy_cols),
+    polish=True,
+    popsize=15,
+    tol=1e-6
+)
 
-# Predicción de la inductancia para los parámetros optimizados
-coil_type = 1
+opt_p1, opt_p2, opt_Lc, opt_r2, opt_wd = res.x
 
-# Obtener las columnas de entrada del DataFrame original
-columns = X.columns
+# 7. Predicción con parámetros óptimos
+best_features = {
+    'pitch1': opt_p1,
+    'pitch2': opt_p2,
+    'Lcore': opt_Lc,
+    'r2': opt_r2,
+    'r1': fixed['r1'],
+    'core_wd': opt_wd,
+    'turns1': fixed['turns1'],
+    'turns2': fixed['turns2'],
+}
+for col in dummy_cols:
+    best_features[col] = 1 if col == f"coil_type_{fixed['coil_type']}" else 0
 
-# Crear un DataFrame con las características predichas y los nombres de las columnas correctas
-X_pred_optimized_df = pd.DataFrame([[opt_p1, opt_p2, opt_Lc, coil_type]], columns=columns)
+X_opt = pd.DataFrame([best_features])[rf.feature_names_in_]
+predicted_L = rf.predict(X_opt)[0]
 
-# Realizar la predicción
-predicted_L = rf.predict(X_pred_optimized_df)[0]
+print("Óptimos encontrados:")
+print(f"  pitch1    = {opt_p1:.10f} mm")
+print(f"  pitch2    = {opt_p2:.10f} mm")
+print(f"  Lcore     = {opt_Lc:.10f} mm")
+print(f"  r2        = {opt_r2:.10f} mm")
+print(f"  core_wd   = {opt_wd:.10f} mm")
+print(f"  Inductancia predicha = {predicted_L:.10e} H")
 
-# Imprimir resultados
-print(f"Óptimos encontrados:")
-print(f"  pitch1 = {opt_p1:.10f} mm")
-print(f"  pitch2 = {opt_p2:.10f} mm")
-print(f"  Lcore  = {opt_Lc:.10f} mm")
-print(f"  Inductancia predicha = {predicted_L:.10f} H")
-
-# Crear un archivo de texto con los resultados
-with open('C:/Users/Patriciagh/Documents/TFM/Pruebas/Resultados/optimized_results_l3.txt', 'w') as file:
-    file.write(f"Óptimos encontrados:\n")
-    file.write(f"  pitch1 = {opt_p1:.3f} mm\n")
-    file.write(f"  pitch2 = {opt_p2:.3f} mm\n")
-    file.write(f"  Lcore  = {opt_Lc:.3f} mm\n")
+# Guardar resultados en un archivo de texto
+out_path = 'C:/Users/Patriciagh/Documents/TFM/Pruebas/Resultados/optimized_results_l3.txt'
+with open(out_path, 'w') as file:
+    file.write("Óptimos encontrados:\n")
+    file.write(f"  pitch1    = {opt_p1:.4f} mm\n")
+    file.write(f"  pitch2    = {opt_p2:.4f} mm\n")
+    file.write(f"  Lcore     = {opt_Lc:.4f} mm\n")
+    file.write(f"  r2        = {opt_r2:.4f} mm\n")
+    file.write(f"  core_wd   = {opt_wd:.4f} mm\n")
     file.write(f"  Inductancia predicha = {predicted_L:.4e} H\n")
+
+#  8) Encuentra las filas reales más cercanas a L_target
+L_target_map = {
+    1: 1e-6,
+    2: 1.5e-6,
+    3: 0.6e-6,
+    4: 1.5e-6,
+    5: 1.0e-6,
+    6: 0.0049e-6,
+}
+L_target = L_target_map[ fixed['coil_type'] ]
+
+df_ct = df[df['coil_type'] == fixed['coil_type']].copy()
+df_ct['error_abs'] = (df_ct['L'] - L_target).abs()
+closest = df_ct.nsmallest(10, 'error_abs')   # las 10 más cercanas
+
+cols = ['turns1','turns2','r1','pitch1','pitch2',
+        'Lcore','r2','core_wd','L','error_abs']
+print("\nFilas del CSV más cercanas a L_target:")
+print( closest[cols].to_string(index=False) )

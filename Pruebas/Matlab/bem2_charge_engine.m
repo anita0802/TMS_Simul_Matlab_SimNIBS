@@ -20,20 +20,20 @@ b        = 2*(contrast.*sum(normals.*Einc, 2));                         %  Right
 IncFieldTime = toc
 
 %%  GMRES iterative solution (native MATLAB GMRES is used)
-h           = waitbar(0.5, 'Please wait - Running GMRES');  
+%h           = waitbar(0.5, 'Please wait - Running GMRES');  
 %   MATVEC is the user-defined function of c equal to the left-hand side of the matrix equation LHS(c) = b
 MATVEC = @(c) bemf4_surface_field_lhs(c, Center, Area, contrast, normals, weight, EC, prec);     
 %   Use custom GMRES (MATLAB GMRES gives the identical solution for a given # of iterations)
 [c, its, resvec] = fgmres(MATVEC, b, relres, 'restart', iter, 'x0', b, 'tol_exit', relres);
-close(h);
+%close(h);
 
-%%  Plot convergence history
-figure; 
-resvec = [1; resvec];
-semilogy(resvec, '-o'); grid on;
-title('Relative residual of the iterative solution');
-xlabel('Iteration number');
-ylabel('Relative residual');
+% %%  Plot convergence history
+% figure; 
+% resvec = [1; resvec];
+% semilogy(resvec, '-o'); grid on;
+% title('Relative residual of the iterative solution');
+% xlabel('Iteration number');
+% ylabel('Relative residual');
 
 %%  Check charge conservation law (optional)
 conservation_law_error = sum(c.*Area)/sum(abs(c).*Area)
