@@ -4,9 +4,9 @@
 %   Copyright SNM/WAW 2017-2020
 
 %%  Define all three planes (mm)
-X       = 0.14;                  %   YZ Cross-section position, mm
-Y       = -18.79;                %   XZ Cross-section position, mm
-Z       = 13.35;                 %   XY Cross-section position, mm
+X       = crossSectionPos_X;        %   YZ Cross-section position, mm
+Y       = crossSectionPos_Y;        %   XZ Cross-section position, mm
+Z       = crossSectionPos_Z;        %   XY Cross-section position, mm
 delta   = 15;                       %   half plane window, mm      
 xmin = X - delta;                   % Cross-section left edge 
 xmax = X + delta;                   % Cross-section right edge

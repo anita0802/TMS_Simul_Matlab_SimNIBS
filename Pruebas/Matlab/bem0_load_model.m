@@ -31,7 +31,7 @@ mu0         = 1.25663706e-006;  %   Magnetic permeability of vacuum(~air)
 
 %%  Import geometry and electrode data. Create useful sparse matrices. Import existing solution (if any)
 tic
-h                   = waitbar(0.5, 'Please wait - loading model data and existing solution (if any)'); 
+%h                   = waitbar(0.5, 'Please wait - loading model data and existing solution (if any)'); 
     load('C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\Model\CombinedMesh');
     load('C:\Users\Patriciagh\Documents\TFM\Pruebas\Matlab\Model\CombinedMeshP.mat');
 
@@ -40,5 +40,5 @@ if exist('output_charge_solution.mat', 'file')
     load output_charge_solution.mat
 end
      
-close(h);
+%close(h);
 LoadTime = toc

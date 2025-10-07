@@ -17,7 +17,7 @@ fprintf('El valor de dIdt es: %.4f\n', strcoil.dIdt);
 
 %%  Position coil
 %   Give the target point (mm)
-TARGET(1, :) = [0 -19.5 13.9];
+TARGET(1, :) = [coil_pos_coordinates_X coil_pos_coordinates_Y coil_pos_coordinates_Z];
 ANGLE(1)     = +0.0;
 ANGLE(2)     = -pi/6;
 ANGLE(3)     = -pi/3;
@@ -66,46 +66,46 @@ proj1 = Pcore * coilAxis';
 lower1 = Pcore(idxMin1, :);    % extremo inferior nuevo
 
 % Dibujamos cruz verde en Target y círculo azul en lower1 (deberían coincidir)
-hold on
-plot3(Target(1), Target(2), Target(3), 'xg', 'MarkerSize',12,'LineWidth',2);
-plot3(lower1(1), lower1(2), lower1(3), 'ob', 'MarkerSize',12,'LineWidth',2);
+% hold on
+% plot3(Target(1), Target(2), Target(3), 'xg', 'MarkerSize',12,'LineWidth',2);
+% plot3(lower1(1), lower1(2), lower1(3), 'ob', 'MarkerSize',12,'LineWidth',2);
 
 fprintf('Coordenadas del extremo inferior del core de la bobina en: [%.4f, %.4f, %.4f] m\n', lower1);
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-%%  Head graphics
-tissue_to_plot = 'Skin';
-t0 = t(Indicator==find(strcmp(tissue, tissue_to_plot)), :);    % (change indicator if necessary: 1-skin, 2-skull, etc.)
-str.EdgeColor = 'none'; str.FaceColor = 'c'; str.FaceAlpha = 1.0; 
-bemf2_graphics_base(P, t0, str);
-camlight; lighting phong;
-title(strcat('Total number of facets: ', num2str(size(t, 1))));     
-
-%%  Coil graphics    
-hold on;
-bemf1_graphics_coil_CAD(strcoil.P, strcoil.t, 1);
-
-%%  Core graphics
-if size(fields(strcoil), 1)>7
-    str.EdgeColor = 'y'; str.FaceColor = 'c'; str.FaceAlpha = 1.0; 
-    bemf2_graphics_base(strcoil.CoreP, strcoil.Coret, str);
-end
-%camlight; lighting phong;
-
-%% Line graphics (optional)
+% %  Head graphics
+% tissue_to_plot = 'Skin';
+% t0 = t(Indicator==find(strcmp(tissue, tissue_to_plot)), :);    % (change indicator if necessary: 1-skin, 2-skull, etc.)
+% str.EdgeColor = 'none'; str.FaceColor = 'c'; str.FaceAlpha = 1.0; 
+% bemf2_graphics_base(P, t0, str);
+% camlight; lighting phong;
+% title(strcat('Total number of facets: ', num2str(size(t, 1))));     
+% 
+% %  Coil graphics    
+% hold on;
+% bemf1_graphics_coil_CAD(strcoil.P, strcoil.t, 1);
+% 
+% %  Core graphics
+% if size(fields(strcoil), 1)>7
+%     str.EdgeColor = 'y'; str.FaceColor = 'c'; str.FaceAlpha = 1.0; 
+%     bemf2_graphics_base(strcoil.CoreP, strcoil.Coret, str);
+% end
+% camlight; lighting phong;
+% 
+% % Line graphics (optional)
 %   Give the target point (m) on gray matter interface (optional)
-%bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
-
-%%%%%%%%%%%%%%%%%%%%%%%%
-bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xyz');
-%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%  General settings
-axis 'equal';  axis 'tight';   
-daspect([1 1 1]);
-set(gcf,'Color','White');
-
-axis off; view(180, 0);
+% bemf1_graphics_lines(Nx, Ny, Nz, MoveX, MoveY, MoveZ, Target, handle, 'xyz');
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%
+% bemf1_graphics_lines(Nx, Ny, Nz, lower1(1), lower1(2), lower1(3), lower1, handle, 'xyz');
+% %%%%%%%%%%%%%%%%%%%%%%%
+% 
+% %  General settings
+% axis 'equal';  axis 'tight';   
+% daspect([1 1 1]);
+% set(gcf,'Color','White');
+% 
+% axis off; view(180, 0);
 
 % % Find nearest intersections of the coil centerline w tissues
 % %  Ray parameters (in mm here)
