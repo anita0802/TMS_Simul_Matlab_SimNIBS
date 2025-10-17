@@ -1,5 +1,4 @@
-## DESARROLLO DE UN MÓDULO PARA SIMULACIONES DE ESTIMULACIÓN MAGNÉTICA TRANSCRANEAL
+## DEVELOPMENT OF A MODULE FOR TRANSCRANIAL MAGNETIC STIMULATION SIMULATIONS
 
-- **Autora: Patricia García Herreros**
-- **Trabajo Fin de Máster**
-- **Máster Universitario en Ingeniería de Sistemas Electrónicos**
+- **Autor: Ana Carretero**
+- **Co-author: Patricia García**
