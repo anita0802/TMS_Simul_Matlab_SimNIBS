@@ -10,7 +10,7 @@ from simnibs import sim_struct, run_simnibs
 import json
 from pathlib import Path
 
-with open("config.json", "r") as f:
+with open("D:/psymulator/TMS_Simul_Matlab_SimNIBS/SimNIBS/config.json", "r") as f:
     config = json.load(f)
 
 ### General information
@@ -22,12 +22,12 @@ S.fields = 'eE' #Fields to calculate
 
 ## Define the TMS simulation
 tms = S.add_tmslist()
-tms.fnamecoil = os.path.join('commercial_coils','tcd','CoilL1_1A.tcd')  # Choose a coil model
+tms.fnamecoil = os.path.join(Path(config["tcd_coils"]),'CoilL1_2A.tcd')  # Choose a coil model
 
 # Define the coil position
 pos = tms.add_position()
 pos.pos_ydir = [0,1,0]  #Orientation of the coil
-pos.distance = -15.5  #Distance from coil surface to cortex surface (mm) || negativo porque la normal apunta hacia dentro del cráneo
+pos.distance = 0.5#-15.5  #Distance from coil surface to cortex surface (mm) || negativo porque la normal apunta hacia dentro del cráneo
 
 ############ 0.5A ############
 #pos.didt = 3846.1538        # BobinaL1 0.5A

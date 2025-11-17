@@ -36,8 +36,8 @@ def run_scripts_in_folder(folder, coil_labels, current_labels, extra_labels=None
 
 def main():
     # 🔹 Patrones comunes
-    coil_labels = ["L1", "L3", "L4", "L5"]
-    current_labels = ["05A", "1A", "2A"]
+    coil_labels = ["L1", "L3", "L4", "L5", "kirlia"]
+    current_labels = ["05A", "1A", "2A", "5A"]
 
     # 🔹 Configuración por carpeta
     folders_config = [
