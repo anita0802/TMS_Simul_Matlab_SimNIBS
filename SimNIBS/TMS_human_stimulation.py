@@ -5,8 +5,8 @@
     Copyright (C) 2018 Guilherme B Saturnino
 """
 import os
+import numpy as np
 from simnibs import sim_struct, run_simnibs
-
 import json
 from pathlib import Path
 
@@ -22,13 +22,26 @@ S.fields = 'eE' #Fields to calculate
 
 ## Define the TMS simulation
 tms = S.add_tmslist()
-tms.fnamecoil = os.path.join(Path(config["tcd_coils"]),'CoilL1_2A.tcd')  # Choose a coil model
+tms.fnamecoil = os.path.join(Path(config["tcd_coils"]),'Coilkirlia_5A.tcd')  # Choose a coil model
 
 # Define the coil position
 pos = tms.add_position()
-pos.pos_ydir = [0,1,0]  #Orientation of the coil
-pos.distance = 0.5#-15.5  #Distance from coil surface to cortex surface (mm) || negativo porque la normal apunta hacia dentro del cráneo
+# ---- Completely disable automatic direction placement ----
+pos.use_direction = False
+pos.pos = None
+pos.pos_ydir = None
+pos.pos_zdir = None
 
+# ---- DO NOT use distance with matsimnibs ----
+pos.distance = 0
+
+###-----------------------------------------
+### Define coil current
+###-----------------------------------------
+# Change this when change the coil
+pos.didt = 337.8378   # Kirlia 5A, rise time 14.8ms
+
+# If you want to know the rise time of every coil, tr = I/didt
 ############ 0.5A ############
 #pos.didt = 3846.1538        # BobinaL1 0.5A
 #pos.didt = 3333.3333        # BobinaL3 0.5A
@@ -40,14 +53,40 @@ pos.distance = 0.5#-15.5  #Distance from coil surface to cortex surface (mm) || 
 #pos.didt = 5882.3529        # BobinaL4 1A
 #pos.didt = 4854.3689        # BobinaL5 1A
 ############ 2A ############
-pos.didt = 15384.6154       # BobinaL1 2A
+#pos.didt = 15384.6154       # BobinaL1 2A
 #pos.didt = 13333.3333       # BobinaL3 2A
 #pos.didt = 11764.7059       # BobinaL4 2A
 #pos.didt = 9708.7379        # BobinaL5 2A
 
+###-----------------------------------------
+### Define coil transform (independent of the mouse)
+###-----------------------------------------
+# Example: identity rotation (coil straight)
+R = np.eye(3)
+alpha = np.deg2rad(180)
+Rx = np.array([[1,0,0],
+               [0,np.cos(alpha), -np.sin(alpha)],
+               [0,np.sin(alpha),  np.cos(alpha)]])
 
-# Define el punto de anclaje de la bobina - centro de la bobina antes de separarlo de la superficie del cerebro
-pos.centre = [19,5,81.4]
+Ry = np.array([ np.cos(alpha), 0, np.sin(alpha)],
+              [0, 1, 0],
+              [-np.sin(alpha), 0, np.cos(alpha)])
+
+Rz = np.array([np.cos(alpha), -np.sin(alpha), 0],
+              [np.sin(alpha),  np.cos(alpha), 0],
+              [0, 0, 1])
+# R = Rx @ Ry @ Rz
+R = Rx
+# Example: coil center given manually (mm)
+tx, ty, tz = 19, 5, 80
+
+# Build transformation matrix
+M = np.eye(4)
+M[:3, :3] = R
+M[:3, 3] = [tx, ty, tz]
+
+# Assign to SimNIBS
+pos.matsimnibs = M
 
 # Run Simulation
 run_simnibs(S)

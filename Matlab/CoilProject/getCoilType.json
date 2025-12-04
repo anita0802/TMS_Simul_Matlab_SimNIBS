@@ -8,8 +8,8 @@
     "radius1": 0.00325,
     "pitch1": 0.00616,
     "turns2": 2.5,
-    "radius2": 0.0016563,
-    "pitch2": 0.002016
+    "radius2": 0.002016,
+    "pitch2": 0.0016563
   },
   "bobinaL2": {
     "t_rise": 0.00014,
@@ -78,9 +78,33 @@
     "L": 2E-6,
     "turns1": 2,
     "radius1": 0.005,
-    "pitch1": 0.004,
+    "pitch1": 0.0009,
     "turns2": 6,
-    "radius2": 0.00125,
-    "pitch2": 0.00133
+    "radius2": 0.0085,
+    "pitch2": 0.0008
+  },
+  "kirlia_coil_4A": {
+    "t_rise": 0.001,
+    "wd": 0.0001,
+    "h": 0.026,
+    "L": 0.033,
+    "turns1": 34,
+    "radius1": 0.025,
+    "pitch1": 0.0003,
+    "turns2": 25,
+    "radius2": 0.024,
+    "pitch2": 0.0003
+  },
+  "kirlia_5A": {
+    "t_rise": 0.0148,
+    "wd": 0.0004,
+    "h": 0.02,
+    "L": 0.033,
+    "turns1": 34,
+    "radius1": 0.025,
+    "pitch1": 0.0008,
+    "turns2": 25,
+    "radius2": 0.025,
+    "pitch2": 0.0011
   }
 }

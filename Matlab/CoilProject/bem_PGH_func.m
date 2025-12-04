@@ -1,12 +1,16 @@
-function bem_PGH(coil_pos_coordinates_X, coil_pos_coordinates_Y, coil_pos_coordinates_Z, cross_section_plane, cross_section_pos_X, cross_section_pos_Y, cross_section_pos_Z)
+function bem_PGH_func(coil_pos_coordinates_X, coil_pos_coordinates_Y, coil_pos_coordinates_Z, cross_section_plane, cross_section_pos_X, cross_section_pos_Y, cross_section_pos_Z)
     load('coil_inductance_workspace.mat');
 
-    cd ../../
+    cd ../
     bem0_load_model
     
     coilPosCoord_X = coil_pos_coordinates_X;
     coilPosCoord_Y = coil_pos_coordinates_Y;
     coilPosCoord_Z = coil_pos_coordinates_Z;
+
+    coil_pos_coordinates_X = coil_pos_coordinates_X;
+    coil_pos_coordinates_Y = coil_pos_coordinates_Y;
+    coil_pos_coordinates_Z = coil_pos_coordinates_Z;
 
     bem1_setup_coil
     bem2_charge_engine

@@ -43,9 +43,11 @@ def spiral_coil_helixin(outer_diam_coil_helixin: float, segment_count: int):
 
     return path
 
+# When the turns of the core increase, the field also increases. Also, when height of the core decreases, the field increses.
+
 def spiral_core(outer_diam_core: float, segment_count: int):
     # Turns of the core
-    N3=59        # PARÁMETRO QUE SE PUEDE VARIAR
+    N3=155        # PARÁMETRO QUE SE PUEDE VARIAR
     # Height of the core (mm)
     h3=5           # PARÁMETRO QUE SE PUEDE VARIAR
 
@@ -62,7 +64,7 @@ def spiral_core(outer_diam_core: float, segment_count: int):
 
 def spiral_core_2(outer_diam_core2: float, segment_count: int):
     # Turns of the core
-    N4=59        # PARÁMETRO QUE SE PUEDE VARIAR
+    N4=160        # PARÁMETRO QUE SE PUEDE VARIAR
     # Height of the core (mm)
     h4=5           # PARÁMETRO QUE SE PUEDE VARIAR
 
@@ -79,7 +81,7 @@ def spiral_core_2(outer_diam_core2: float, segment_count: int):
 
 def spiral_core_3(outer_diam_core3: float, segment_count: int):
     # Turns of the core
-    N5=59        # PARÁMETRO QUE SE PUEDE VARIAR
+    N5=160        # PARÁMETRO QUE SE PUEDE VARIAR
     # Height of the core (mm)
     h5=5           # PARÁMETRO QUE SE PUEDE VARIAR
 
@@ -96,7 +98,7 @@ def spiral_core_3(outer_diam_core3: float, segment_count: int):
 
 def spiral_core_4(outer_diam_core4: float, segment_count: int):
     # Turns of the core
-    N6=59       # PARÁMETRO QUE SE PUEDE VARIAR
+    N6=160       # PARÁMETRO QUE SE PUEDE VARIAR
     # Height of the core (mm)
     h6=5           # PARÁMETRO QUE SE PUEDE VARIAR
 
@@ -176,9 +178,9 @@ def figure_of_wire_path(
 segment_count = 1000
 radius_coil_helixout = 0.025
 radius_coil_helixin  = 0.0246
-radius_core = 0.023
-outer_diam_core2 = 0.022*1000
-outer_diam_core3 = 0.021*1000
+radius_core = 0.024
+outer_diam_core2 = 0.023*1000
+outer_diam_core3 = 0.022*1000
 outer_diam_core4 = 0.01*1000
 
 outer_diam_coil_helixout = radius_coil_helixout*1000  # mm

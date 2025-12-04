@@ -219,4 +219,4 @@ tms_coil.generate_element_casings(
 )
 
 # Write the coil to a tcd file
-tms_coil.write("tcd/BobinaL5_ratón_PGH_1A.tcd")
+tms_coil.write("tcd/CoilL5_1A.tcd")

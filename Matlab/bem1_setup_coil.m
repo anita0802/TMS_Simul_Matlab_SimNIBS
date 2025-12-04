@@ -7,7 +7,17 @@
 if exist('strcoil', 'var')
     clear strcoil;
 end
-load('C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/coil.mat');      
+% Obtain the path to the coil.mat
+thisFile = mfilename('fullpath');
+[thisDir, ~, ~] = fileparts(thisFile);
+coilPath = fullfile(thisDir, 'CoilProject', 'coil.mat');
+
+if isfile(coilPath)
+    load(coilPath); 
+else
+    warning('Coil file not found at %s', coilPath);
+end
+     
 %strcoil.Moments = 0*strcoil.Moments; % remove core effect and see what happens
 
 strcoil.dIdt = dIdt;    % dIdt lo defines antes, con getSignalExcitation

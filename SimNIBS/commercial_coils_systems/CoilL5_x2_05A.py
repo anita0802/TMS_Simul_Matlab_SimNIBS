@@ -359,4 +359,4 @@ tms_coil.generate_element_casings(
 )
 
 # Write the coil to a tcd file
-tms_coil.write("tcd/SisEstL5_val_PGH_05A.tcd")
+tms_coil.write("tcd/CoilL5_x2_05A.tcd")

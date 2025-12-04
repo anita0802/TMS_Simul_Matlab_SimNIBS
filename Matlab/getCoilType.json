@@ -1,0 +1,103 @@
+{
+  "bobinaL1": {
+    "t_rise": 0.00013,
+    "wd": 0.00075,
+    "h": 0.0062,
+    "L": 1E-6,
+    "turns1": 1,
+    "radius1": 0.00325,
+    "pitch1": 0,
+    "turns2": 2.5,
+    "radius2": 0,
+    "pitch2": 0
+  },
+  "bobinaL2": {
+    "t_rise": 0.00014,
+    "wd": 0.00045,
+    "h": 0.0056,
+    "L": 1.5E-6,
+    "turns1": 5.5,
+    "radius1": 0.0025,
+    "pitch1": 0.0010182,
+    "turns2": 0,
+    "radius2": 0,
+    "pitch2": 0
+  },
+  "bobinaL3": {
+    "t_rise": 0.00015,
+    "wd": 0.00042,
+    "h": 0.0023,
+    "L": 6E-7,
+    "turns1": 0.5,
+    "radius1": 0.0028,
+    "pitch1": 0.00414,
+    "turns2": 4,
+    "radius2": 0.0007,
+    "pitch2": 0.000633
+  },
+  "bobinaL4": {
+    "t_rise": 0.00017,
+    "wd": 0.0002,
+    "h": 0.0018,
+    "L": 1.5E-6,
+    "turns1": 2,
+    "radius1": 0.00125,
+    "pitch1": 0.00081,
+    "turns2": 4.5,
+    "radius2": 0.000681,
+    "pitch2": 0.00036
+  },
+  "bobinaL5": {
+    "t_rise": 0.000206,
+    "wd": 0.00012,
+    "h": 0.001,
+    "L": 1E-6,
+    "turns1": 2.5,
+    "radius1": 0.0012,
+    "pitch1": 0.00036,
+    "turns2": 5,
+    "radius2": 0.0003,
+    "pitch2": 0.00018
+  },
+  "bobinaL6": {
+    "t_rise": 0.00016,
+    "wd": 7E-5,
+    "h": 0.0008,
+    "L": 4.9E-9,
+    "turns1": 1,
+    "radius1": 0.0003,
+    "pitch1": 0.0008,
+    "turns2": 0,
+    "radius2": 0,
+    "pitch2": 0
+  },
+  "New_Coil_7": {
+    "t_rise": 0.000175,
+    "wd": 0.0006,
+    "h": 0.005,
+    "L": 2E-6,
+    "turns1": 2,
+    "radius1": 0.005,
+    "pitch1": 0.0009,
+    "turns2": 6,
+    "radius2": 0.0085,
+    "pitch2": 0.0008
+  },
+  "kirlia_coil_4A": {
+    "t_rise": 0.001,
+    "wd": 0.00085,
+    "h": 0.019,
+    "L": 0.033,
+    "turns1": 29,
+    "radius1": 0.025,
+    "pitch1": 0.0005,
+    "turns2": 30,
+    "radius2": 0.02,
+    "pitch2": 0.0003
+  },
+  "kirlia_5A": {
+    "pitch1": 0.0008,
+    "radius2": 0.025,
+    "pitch2": 0.0011
+  }
+}

@@ -474,7 +474,7 @@ function [Inductance, coil, core, strcoil, GEOM, Moments] = coil_inductance_PGH(
     %%
 
     % Carpeta de destino
-    folder = 'C:/Users/Patriciagh/Documents/TFM/Pruebas/Matlab/Coil/CoilProject/Summary_txt';
+    folder = 'D:\psymulator\TMS_Simul_Matlab_SimNIBS\Matlab\CoilProject/Summary_txt';
     
     % Crear la carpeta si no existe
     if ~exist(folder, 'dir')
